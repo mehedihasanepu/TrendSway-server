@@ -44,6 +44,14 @@ async function run() {
         })
 
 
+        app.get('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await productCollection.findOne(query);
+            res.send(result)
+        })
+
+
 
         app.post('/products', async (req, res) => {
             const newProduct = req.body;
@@ -52,6 +60,28 @@ async function run() {
             const result = await productCollection.insertOne(newProduct);
             res.send(result)
         })
+
+
+        app.put('/products/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateProduct = req.body;
+            const product = {
+                $set: {
+                    productName: updateProduct.productName,
+                    productImg: updateProduct.productImg,
+                    details: updateProduct.details,
+                    brandName: updateProduct.brandName,
+                    productType: updateProduct.productType,
+                    price: updateProduct.price,
+                    rating: updateProduct.rating
+                }
+            }
+            const result= await productCollection.updateOne(filter,product,options)
+            res.send(result)
+        })
+
 
 
 
@@ -70,6 +100,7 @@ async function run() {
             const result = await cartCollection.insertOne(newCartProduct);
             res.send(result)
         })
+
 
 
 
@@ -100,7 +131,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('TrendSway server is running')
+    res.send('TrendSway server is running now')
 })
 
 app.listen(port, () => {
